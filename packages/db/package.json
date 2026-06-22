@@ -1,0 +1,24 @@
+{
+  "name": "@repo/db",
+  "version": "0.0.1",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
+  },
+  "devDependencies": {
+    "prisma": "^7.8.0",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.22.0"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
