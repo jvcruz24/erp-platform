@@ -1,17 +1,24 @@
 {
   "name": "@repo/db",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "db:generate-auth": "pnpm --filter @repo/auth dlx auth@latest generate --output ../db/prisma/schema.prisma"
+    "build": "tsc -p tsconfig.json --outDir dist"
   },
   "devDependencies": {
-    "prisma": "^7.8.0",
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^26.1.0",
+    "@types/pg": "^8.20.0",
+    "prisma": "^7.8.0",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
@@ -20,6 +27,6 @@
     "pg": "^8.22.0"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./dist/src/index.js"
   }
 }

@@ -1,8 +1,11 @@
 {
   "extends": "@repo/typescript-config/base.json",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "tsup.config.ts"],
-  "exclude": ["node_modules"],
   "compilerOptions": {
-    "strictNullChecks": true
-  }
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strictNullChecks": true,
+    "rootDir": "."
+  },
+  "include": ["**/*.ts", "**/*.tsx", "tsup.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }
