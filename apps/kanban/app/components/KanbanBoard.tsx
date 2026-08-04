@@ -1,8 +1,9 @@
 'use client';
+import Link from 'next/link';
 import { Fragment, useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import {
-  BoardRepository,
+  BoardDetailRepository,
   COLUMN_NAME_MAX_LENGTH,
   TITLE_MAX_LENGTH,
 } from '@repo/kanban-domain';
@@ -15,15 +16,16 @@ import { InlineAddForm } from './InlineAddForm';
 import { DropGhost } from './DropGhost';
 
 interface KanbanBoardProps {
-  repository?: BoardRepository;
+  boardId: string;
+  repository?: BoardDetailRepository;
 }
 
-export default function KanbanBoard({ repository }: KanbanBoardProps) {
+export default function KanbanBoard({ boardId, repository }: KanbanBoardProps) {
   const repo = useMemo(
     () => repository ?? new InMemoryBoardRepository(),
     [repository],
   );
-  const board = useKanbanBoard(repo);
+  const board = useKanbanBoard(repo, boardId);
   const dnd = useTicketDragAndDrop();
 
   const [addingCardIn, setAddingCardIn] = useState<string | null>(null);
@@ -69,6 +71,18 @@ export default function KanbanBoard({ repository }: KanbanBoardProps) {
 
   return (
     <div className='w-full h-full bg-slate-50 p-4'>
+      <div className='mb-3 flex items-center justify-between'>
+        <h1 className='text-base font-semibold text-slate-800'>
+          {board.boardName}
+        </h1>
+        <Link
+          href='/boards'
+          className='text-xs text-slate-500 hover:text-slate-700 hover:underline'
+        >
+          All boards
+        </Link>
+      </div>
+
       {board.error && (
         <div className='mb-3 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700'>
           <span>{board.error}</span>

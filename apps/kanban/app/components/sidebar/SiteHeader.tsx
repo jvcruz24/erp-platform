@@ -7,7 +7,7 @@ import {
   AvatarGroupCount,
   AvatarFallback,
   AvatarImage,
-} from './ui/avatar';
+} from '../../../../../packages/ui/src/components/ui/avatar';
 
 export function SiteHeader() {
   return (

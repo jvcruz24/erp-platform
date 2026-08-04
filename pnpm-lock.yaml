@@ -6,6 +6,18 @@ settings:
 
 catalogs:
   default:
+    '@hugeicons/core-free-icons':
+      specifier: ^4.2.3
+      version: 4.2.3
+    '@hugeicons/react':
+      specifier: ^1.1.9
+      version: 1.1.9
+    '@tanstack/react-query':
+      specifier: ^5.101.4
+      version: 5.101.4
+    uuidv7:
+      specifier: ^1.2.1
+      version: 1.2.1
     zod:
       specifier: ^4.4.3
       version: 4.4.3
@@ -126,12 +138,21 @@ importers:
 
   apps/kanban:
     dependencies:
+      '@hugeicons/core-free-icons':
+        specifier: 'catalog:'
+        version: 4.2.3
+      '@hugeicons/react':
+        specifier: 'catalog:'
+        version: 1.1.9(react@19.2.4)
       '@repo/kanban-domain':
         specifier: workspace:*
         version: link:../../packages/kanban-domain
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.101.4(react@19.2.4)
       lucide-react:
         specifier: ^1.26.0
         version: 1.27.0(react@19.2.4)
@@ -254,6 +275,9 @@ importers:
 
   packages/kanban-domain:
     dependencies:
+      uuidv7:
+        specifier: 'catalog:'
+        version: 1.2.1
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -2499,6 +2523,14 @@ packages:
 
   '@tailwindcss/postcss@4.3.3':
     resolution: {integrity: sha512-JTSZZGQi1AyKirbLN3azmjVzef92tcX7h+iSqPdaeStyFpGpDlKvvpxeOE8njhbUanbRwr3z8DyzhICWnMtQeg==}
+
+  '@tanstack/query-core@5.101.4':
+    resolution: {integrity: sha512-gNwcvOJcRbLWPOLG/2OBm+zM+Yv+MKsXKEOWC57USuZDEsI71hEErQsiEGx5wX9rzWWkfwM0fVSPoiIFSsxfiw==}
+
+  '@tanstack/react-query@5.101.4':
+    resolution: {integrity: sha512-yRg2pfOCxIs4ZJW3XYYHU/WgtD04FHSnfHlpRT7h7pR77hwkdRG4wxbKe4aq6P0RvXUTBSQpQeadS1SUYUe+KA==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@thallesp/nestjs-better-auth@2.7.0':
     resolution: {integrity: sha512-Grq74scQ4AdEjrAr9mE8780u9N4fn+X/qz7DTHa/K37g+RPw+R3Yde4leRz/UIqsLx0o8p1B5wRGPnM65Q+ZsQ==}
@@ -6429,6 +6461,10 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  uuidv7@1.2.1:
+    resolution: {integrity: sha512-4kPkK3/XTQW9Hbm4CaqfICn+kY9LJtDVEOfgsRRra/+n2Ofg4NqzRFceAkxvQ/Ud/6BpHOPzj8cirqM7TzTN5Q==}
+    hasBin: true
+
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
@@ -8900,6 +8936,13 @@ snapshots:
       '@tailwindcss/oxide': 4.3.3
       postcss: 8.5.24
       tailwindcss: 4.3.3
+
+  '@tanstack/query-core@5.101.4': {}
+
+  '@tanstack/react-query@5.101.4(react@19.2.4)':
+    dependencies:
+      '@tanstack/query-core': 5.101.4
+      react: 19.2.4
 
   '@thallesp/nestjs-better-auth@2.7.0(@nestjs/common@11.1.28(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.1.28)(better-auth@1.6.25(@prisma/client@7.9.1(prisma@7.9.1(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.2))(typescript@5.9.2))(mysql2@3.15.3)(next@16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pg@8.22.0)(prisma@7.9.1(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(express@5.2.1(supports-color@8.1.1))(qs@6.15.3)(typescript@5.9.2)':
     dependencies:
@@ -13319,6 +13362,8 @@ snapshots:
       '@types/react': 19.2.2
 
   util-deprecate@1.0.2: {}
+
+  uuidv7@1.2.1: {}
 
   v8-compile-cache-lib@3.0.1: {}
 

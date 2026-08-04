@@ -3,6 +3,10 @@ import {
   memberSchema,
   ticketSchema,
   columnSchema,
+  boardSummarySchema,
+  boardSchema,
+  createBoardInputSchema,
+  renameBoardInputSchema,
   createTicketInputSchema,
   assignTicketInputSchema,
   moveTicketInputSchema,
@@ -10,16 +14,19 @@ import {
   renameColumnInputSchema,
 } from './schemas';
 
-// Previously `Ticket`/`Column`/`Member` were hand-written interfaces that
-// happened to match `sanitizePlainText`'s rules by convention. Deriving them
-// from the schemas instead means the type and the validator can never
-// silently drift apart — change a schema, the type updates automatically,
-// and TS will flag every place that now breaks.
 export type Member = z.infer<typeof memberSchema>;
 export type Ticket = z.infer<typeof ticketSchema>;
 export type Column = z.infer<typeof columnSchema>;
 export type Priority = Ticket['priority'];
 
+// BoardSummary (id + name) is what a board-list view needs. Board extends
+// it with the full column/ticket tree — what a single board's page needs
+// once you've navigated into it.
+export type BoardSummary = z.infer<typeof boardSummarySchema>;
+export type Board = z.infer<typeof boardSchema>;
+
+export type CreateBoardInput = z.infer<typeof createBoardInputSchema>;
+export type RenameBoardInput = z.infer<typeof renameBoardInputSchema>;
 export type CreateTicketInput = z.infer<typeof createTicketInputSchema>;
 export type AssignTicketInput = z.infer<typeof assignTicketInputSchema>;
 export type MoveTicketInput = z.infer<typeof moveTicketInputSchema>;
@@ -33,19 +40,25 @@ export const PRIORITY_META: Record<Priority, { label: string; dot: string }> = {
   URGENT: { label: 'Urgent', dot: 'bg-red-500' },
 };
 
-// ── Repository contract (Dependency Inversion) ───────────────────────────
-// Every method takes the *input* type (validated shape a mutation accepts)
-// and resolves the *entity* type. Implementations (in-memory, API-backed)
-// are still free to re-validate with the same schemas before touching
-// storage — client-side parsing is UX, never the security boundary.
-export interface BoardRepository {
-  load(): Promise<Column[]>;
+export interface BoardListRepository {
+  listBoards(): Promise<BoardSummary[]>;
+  createBoard(input: CreateBoardInput): Promise<BoardSummary>;
+  renameBoard(input: RenameBoardInput): Promise<void>;
+  deleteBoard(boardId: string): Promise<void>;
+}
+
+export interface BoardDetailRepository {
+  loadBoard(boardId: string): Promise<Board>;
   listMembers(): Promise<Member[]>;
   createTicket(input: CreateTicketInput): Promise<Ticket>;
-  deleteTicket(columnId: string, ticketId: string): Promise<void>;
+  deleteTicket(input: {
+    boardId: string;
+    columnId: string;
+    ticketId: string;
+  }): Promise<void>;
   assignTicket(input: AssignTicketInput): Promise<void>;
   moveTicket(input: MoveTicketInput): Promise<void>;
   createColumn(input: CreateColumnInput): Promise<Column>;
   renameColumn(input: RenameColumnInput): Promise<void>;
-  deleteColumn(columnId: string): Promise<void>;
+  deleteColumn(input: { boardId: string; columnId: string }): Promise<void>;
 }

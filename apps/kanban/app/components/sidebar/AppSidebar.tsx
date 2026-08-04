@@ -1,10 +1,13 @@
 'use client';
 
 import * as React from 'react';
+import { BoardSummary } from '@repo/kanban-domain';
+import { useBoardList } from '@/app/hooks/useBoardList';
+import { apiBoardRepository } from '@/app/data/apiBoardRepository';
 
-import { NavBoards } from '@repo/ui/components/nav-boards';
-import { NavUser } from '@repo/ui/components/nav-user';
-import { TeamSwitcher } from '@repo/ui/components/team-switcher';
+import { NavBoards } from '@/app/components/sidebar/NavBoards';
+import { NavUser } from '@/app/components/sidebar/nav-user';
+import { TeamSwitcher } from '@/app/components/sidebar/TeamSwitcher';
 import {
   Sidebar,
   SidebarContent,
@@ -26,7 +29,6 @@ import {
   MapsIcon,
 } from '@hugeicons/core-free-icons';
 
-// This is sample data.
 const data = {
   user: {
     name: 'shadcn',
@@ -206,7 +208,20 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type AppSidebarProps = { boards: BoardSummary[] } & React.ComponentProps<
+  typeof Sidebar
+>;
+
+export function AppSidebar({ boards, ...props }: AppSidebarProps) {
+  const {
+    boards: liveBoards,
+    isLoading,
+    error,
+    createBoard,
+    renameBoard,
+    deleteBoard,
+  } = useBoardList(apiBoardRepository);
+
   return (
     <Sidebar
       collapsible='icon'
@@ -216,7 +231,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavBoards boards={data.boards} />
+        <NavBoards
+          boards={liveBoards}
+          onCreateBoard={createBoard}
+          onDeleteBoard={deleteBoard}
+          onRenameBoard={renameBoard}
+        />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

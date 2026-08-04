@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BoardRepository, Column, Member } from '@repo/kanban-domain';
 
 interface UseKanbanBoardResult {
+  boardName: string | null;
   columns: Column[];
   members: Member[];
   isLoading: boolean;
@@ -25,16 +26,17 @@ interface UseKanbanBoardResult {
 }
 
 /**
- * The hook still exposes simple positional-arg functions to components
- * (`assignTicket(columnId, ticketId, assigneeId)`), and builds the input
- * object the repository (and, ultimately, zod) expects internally. UI code
- * never has to think about schemas — it just calls a function; the
- * repository is where "does this input actually satisfy the schema" gets
- * enforced, whether that's the in-memory repo or a real API-backed one.
+ * Scoped to a single board (`boardId`). The hook still exposes simple
+ * positional-arg functions to components — `assignTicket(columnId,
+ * ticketId, assigneeId)` — and builds the `{ boardId, ... }` input object
+ * the repository expects internally. Switching boards is just passing a
+ * different `boardId`; the effect below re-loads whenever it changes.
  */
 export function useKanbanBoard(
   repository: BoardRepository,
+  boardId: string,
 ): UseKanbanBoardResult {
+  const [boardName, setBoardName] = useState<string | null>(null);
   const [columns, setColumns] = useState<Column[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,14 +45,16 @@ export function useKanbanBoard(
 
   useEffect(() => {
     let cancelled = false;
+    setIsLoading(true);
     (async () => {
       try {
-        const [loadedColumns, loadedMembers] = await Promise.all([
-          repository.load(),
+        const [board, loadedMembers] = await Promise.all([
+          repository.loadBoard(boardId),
           repository.listMembers(),
         ]);
         if (cancelled) return;
-        setColumns(loadedColumns);
+        setBoardName(board.name);
+        setColumns(board.columns);
         setMembers(loadedMembers);
       } catch {
         if (!cancelled) setError("Couldn't load the board. Please refresh.");
@@ -61,7 +65,7 @@ export function useKanbanBoard(
     return () => {
       cancelled = true;
     };
-  }, [repository]);
+  }, [repository, boardId]);
 
   const withOptimisticUpdate = useCallback(
     async (
@@ -87,6 +91,7 @@ export function useKanbanBoard(
       if (!trimmed) return;
       try {
         const ticket = await repository.createTicket({
+          boardId,
           columnId,
           title: trimmed,
         });
@@ -99,7 +104,7 @@ export function useKanbanBoard(
         setError(err instanceof Error ? err.message : "Couldn't add ticket.");
       }
     },
-    [repository],
+    [repository, boardId],
   );
 
   const deleteTicket = useCallback(
@@ -111,10 +116,10 @@ export function useKanbanBoard(
               ? { ...c, tickets: c.tickets.filter((t) => t.id !== ticketId) }
               : c,
           ),
-        () => repository.deleteTicket(columnId, ticketId),
+        () => repository.deleteTicket(boardId, columnId, ticketId),
         "Couldn't delete ticket.",
       ),
-    [repository, withOptimisticUpdate],
+    [repository, boardId, withOptimisticUpdate],
   );
 
   const assignTicket = useCallback(
@@ -131,10 +136,11 @@ export function useKanbanBoard(
                 }
               : c,
           ),
-        () => repository.assignTicket({ columnId, ticketId, assigneeId }),
+        () =>
+          repository.assignTicket({ boardId, columnId, ticketId, assigneeId }),
         "Couldn't reassign ticket.",
       ),
-    [repository, withOptimisticUpdate],
+    [repository, boardId, withOptimisticUpdate],
   );
 
   const moveTicket = useCallback(
@@ -160,10 +166,10 @@ export function useKanbanBoard(
           target.tickets.splice(clampedIndex, 0, moved);
           return next;
         },
-        () => repository.moveTicket({ ticketId, toColumnId, toIndex }),
+        () => repository.moveTicket({ boardId, ticketId, toColumnId, toIndex }),
         "Couldn't move ticket.",
       ),
-    [repository, withOptimisticUpdate],
+    [repository, boardId, withOptimisticUpdate],
   );
 
   const addColumn = useCallback(
@@ -171,39 +177,43 @@ export function useKanbanBoard(
       const trimmed = name.trim();
       if (!trimmed) return;
       try {
-        const column = await repository.createColumn({ name: trimmed });
+        const column = await repository.createColumn({
+          boardId,
+          name: trimmed,
+        });
         setColumns((prev) => [...prev, column]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Couldn't add column.");
       }
     },
-    [repository],
+    [repository, boardId],
   );
 
   const renameColumn = useCallback(
     (columnId: string, name: string) =>
       withOptimisticUpdate(
         (prev) => prev.map((c) => (c.id === columnId ? { ...c, name } : c)),
-        () => repository.renameColumn({ columnId, name }),
+        () => repository.renameColumn({ boardId, columnId, name }),
         "Couldn't rename column.",
       ),
-    [repository, withOptimisticUpdate],
+    [repository, boardId, withOptimisticUpdate],
   );
 
   const deleteColumn = useCallback(
     (columnId: string) =>
       withOptimisticUpdate(
         (prev) => prev.filter((c) => c.id !== columnId),
-        () => repository.deleteColumn(columnId),
+        () => repository.deleteColumn(boardId, columnId),
         "Couldn't delete column.",
       ),
-    [repository, withOptimisticUpdate],
+    [repository, boardId, withOptimisticUpdate],
   );
 
   const dismissError = useCallback(() => setError(null), []);
 
   return useMemo(
     () => ({
+      boardName,
       columns,
       members,
       isLoading,
@@ -218,6 +228,7 @@ export function useKanbanBoard(
       deleteColumn,
     }),
     [
+      boardName,
       columns,
       members,
       isLoading,
