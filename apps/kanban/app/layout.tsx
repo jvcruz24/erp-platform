@@ -27,7 +27,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const boards = await getBoards();
+  // const boards = await getBoards();
 
   return (
     <html lang='en'>
@@ -42,12 +42,11 @@ export default async function RootLayout({
             }
           >
             <TooltipProvider>
-              <AppSidebar boards={boards} />
+              <AppSidebar />
             </TooltipProvider>
             <SidebarInset className='h-full'>
               <SiteHeader />
               {children}
-              <pre>{JSON.stringify(boards, null, 2)}</pre>
             </SidebarInset>
           </SidebarProvider>
         </QueryProvider>

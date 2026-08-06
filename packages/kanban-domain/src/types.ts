@@ -18,10 +18,6 @@ export type Member = z.infer<typeof memberSchema>;
 export type Ticket = z.infer<typeof ticketSchema>;
 export type Column = z.infer<typeof columnSchema>;
 export type Priority = Ticket['priority'];
-
-// BoardSummary (id + name) is what a board-list view needs. Board extends
-// it with the full column/ticket tree — what a single board's page needs
-// once you've navigated into it.
 export type BoardSummary = z.infer<typeof boardSummarySchema>;
 export type Board = z.infer<typeof boardSchema>;
 

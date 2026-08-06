@@ -208,11 +208,9 @@ const data = {
   ],
 };
 
-type AppSidebarProps = { boards: BoardSummary[] } & React.ComponentProps<
-  typeof Sidebar
->;
+type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
 
-export function AppSidebar({ boards, ...props }: AppSidebarProps) {
+export function AppSidebar({ ...props }: AppSidebarProps) {
   const {
     boards: liveBoards,
     isLoading,

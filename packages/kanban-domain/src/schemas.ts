@@ -4,12 +4,6 @@ export const TITLE_MAX_LENGTH = 200;
 export const COLUMN_NAME_MAX_LENGTH = 60;
 export const BOARD_NAME_MAX_LENGTH = 80;
 
-// ── Field-level schemas ──────────────────────────────────────────────────
-// Reused everywhere a title/name is accepted, so the rule lives in exactly
-// one place: apps/kanban's form, apps/api's route handler, and the
-// in-memory repo all import the SAME schema instead of re-implementing
-// "trim, non-empty, max length" three times with three chances to drift.
-
 export const ticketTitleSchema = z
   .string()
   .trim()
@@ -62,12 +56,8 @@ export const columnSchema = z.object({
   tickets: z.array(ticketSchema),
 });
 
-// A lightweight summary — id + name only — for board-list views that
-// shouldn't need to load every column/ticket just to render a list of
-// board names. `boardSchema` (the full shape, with columns) is what a
-// single board's page loads.
 export const boardSummarySchema = z.object({
-  id: z.string().min(1),
+  boardId: z.string().min(1),
   name: boardNameSchema,
 });
 
@@ -75,22 +65,11 @@ export const boardSchema = boardSummarySchema.extend({
   columns: z.array(columnSchema),
 });
 
-// ── Input schemas ─────────────────────────────────────────────────────────
-// What a *mutation* accepts, as opposed to what an entity looks like once
-// stored. Every ticket/column-level input now carries `boardId` — tickets
-// and columns belong to a specific board, not to one implicit global board,
-// so every mutation needs to say which board it's scoped to (this is also
-// what a real API route would use to check the caller actually has access
-// to that board, once auth exists).
-
 export const createBoardInputSchema = z.object({
   name: boardNameSchema,
 });
 
-export const renameBoardInputSchema = z.object({
-  boardId: z.uuidv7(),
-  name: boardNameSchema,
-});
+export const renameBoardInputSchema = boardSummarySchema;
 
 export const createTicketInputSchema = z.object({
   boardId: z.uuidv7(),
