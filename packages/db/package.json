@@ -2,6 +2,7 @@
   "name": "@repo/db",
   "version": "1.0.0",
   "type": "module",
+  "private": true,
   "scripts": {
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -9,7 +10,7 @@
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "build": "tsc -p tsconfig.json --outDir dist"
+    "build": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -26,7 +27,12 @@
     "dotenv": "^17.4.2",
     "pg": "^8.22.0"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
-    ".": "./dist/src/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   }
 }

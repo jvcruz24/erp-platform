@@ -1,12 +1,27 @@
 {
   "name": "@repo/auth",
   "version": "1.0.0",
-  "main": "src/lib/auth.ts",
+  "type": "module",
+  "private": "true",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "auth:generate": "pnpm dlx auth@latest generate --output ../db/prisma/schema.prisma"
+  },
   "dependencies": {
     "@repo/db": "workspace:*",
-    "better-auth": "^1.6.23"
+    "better-auth": "^1.6.23",
+    "zod": "catalog:"
   },
-  "scripts": {
-    "auth:generate": "pnpm dlx auth@latest generate --output ../db/prisma/schema.prisma"
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^6.0.3"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   }
 }
